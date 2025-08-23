@@ -1,27 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from '../config/axios.js';
+import axios from "../config/axios.js";
+import { UserContext } from "../context/user.context.jsx"; // fixed import
 
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-    const [ email, setEmail ] = useState("");
-    const [ password, setPassword ] = useState("");
+  const { setUser } = useContext(UserContext); // fixed usage
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    function submitHandler(e) {
+  function submitHandler(e) {
+    e.preventDefault();
 
-        e.preventDefault();
-
-        axios.post('/users/login', { email, password })
-            .then(response => {
-                console.log(response.data);
-                navigate('/');
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
+    axios
+      .post("/users/login", { email, password })
+      .then((response) => {
+        console.log(response.data);
+        localStorage.setItem("token", response.data.token);
+        setUser(response.data.user);
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900">
